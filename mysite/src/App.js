@@ -9,7 +9,7 @@ import Signup from './signup';
 import NotFound from './404';
 import {useEffect , useState} from "react";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
-
+import Dashboard from './Dashboard';
 
 
 function Home() {
@@ -27,17 +27,7 @@ function Home() {
   )
 }
 
-function Dashboard(){
-  return (
-    <div>
-      <Nav></Nav>
 
-      <h1>Welcome to Dashboard</h1>
-
-      <Footer></Footer>
-    </div>
-  )
-}
 
 function App() {
 
