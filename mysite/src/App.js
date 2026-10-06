@@ -17,7 +17,7 @@ function Home() {
     <div>
       <Nav></Nav>
 
-      <h1>Welcome to <br></br> <span>" EkDoubtHai "</span> </h1>
+      <h1>Welcome to <br></br> <span>" SamjhadeBro "</span> </h1>
 
       <Link to="/login" ><Normalbutton link="/login" txt="Login"></Normalbutton></Link>
       <Link to="/signup" ><Normalbutton link="/signup" txt="Signup"></Normalbutton></Link>
