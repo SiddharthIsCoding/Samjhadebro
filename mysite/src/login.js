@@ -3,8 +3,12 @@ import Nav from './navbar';
 import Footer from "./footer";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
+import { useNavigate } from "react-router";
+
 
 function LoginPage(){
+    const navigate = useNavigate();
+
 
     const [email, setEmail] = react.useState("");
     const [password, setPassword] = react.useState("");
@@ -15,9 +19,10 @@ function LoginPage(){
         try{
             await signInWithEmailAndPassword(auth, email, password);
             alert("Login successful");
+            navigate("/")
         }
         catch(error){
-            alert("Error logging in:", error);
+            alert(error);
         }
     }
 
