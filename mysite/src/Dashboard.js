@@ -34,9 +34,7 @@ function Dashboard(){
     <div>
       <Nav></Nav>
 
-      <h1>Welcome to Dashboard {userName} </h1>
 
-      <button className="normalbtn" onClick={signout}>Logout</button>
 
       <Footer></Footer>
     </div>
