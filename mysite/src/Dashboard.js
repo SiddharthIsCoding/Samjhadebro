@@ -31,9 +31,12 @@ function Dashboard(){
     });
 
   return (
-    <div>
+    <div style={{textAlign:"left"}} >
       <Nav></Nav>
 
+      <button className='normalbtn' style={{background:"gray",width:150 , margin:30,marginTop:40}} >+ Create class</button>
+
+      
 
 
       <Footer></Footer>

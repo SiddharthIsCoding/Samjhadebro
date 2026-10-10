@@ -35,6 +35,8 @@ function Nav(props){
     return(
         <div class="CommonNav" >
             {user?(<button style={{background:"red",position:"absolute",left:10,top:10}} class="normalbtn" onClick={signout} >Logout</button>):(<Link to="/login" ><button style={{position:"absolute",left:10,top:10}} class="normalbtn">Login</button></Link>)}
+
+            {user?(<h3 style={{position:"absolute",left:250,top:30}} >Welcome {user.displayName}</h3>):(<h3 style={{position:"absolute",left:50,top:10}} >Welcome Guest</h3>)}
             <ul>
                 <Link to="/"><li>Home</li></Link>
                 <Link to="/about"><li>About</li></Link>
