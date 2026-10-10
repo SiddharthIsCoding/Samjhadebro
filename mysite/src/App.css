@@ -165,7 +165,7 @@ h1 > span
     top: 0px;
     left: 0px;
     display:none;
-
+    z-index: 100;
 }
 
 #class-list
@@ -174,7 +174,7 @@ h1 > span
     height: 80%;
     background: rgba(0,0,0,0.6);
     position: absolute;
-    z-index:100;
+    z-index:10;
     bottom:40px;
     right: 40px;
 }
