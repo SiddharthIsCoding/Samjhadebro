@@ -34,7 +34,15 @@ function Dashboard(){
     <div style={{textAlign:"left"}} >
       <Nav></Nav>
 
-      <button className='normalbtn' style={{background:"gray",width:150 , margin:30,marginTop:40}} >+ Create class</button>
+      <div onClick={() => {
+        document.getElementById('class-form').style.display = 'none';
+        document.getElementById('blackfilter').style.display = 'none';
+      }} id="blackfilter" ></div>
+
+      <button onClick={() => {
+        document.getElementById('class-form').style.display = 'block';
+        document.getElementById('blackfilter').style.display = 'block';
+      }} className='normalbtn' style={{background:"gray",width:150 , margin:30,marginTop:40}} >+ Create class</button>
 
 
       <div id="class-form" >
@@ -50,7 +58,7 @@ function Dashboard(){
 
           <br></br>
 
-          <button  className='normalbtn' >Create</button>
+          <button className='normalbtn' >Create</button>
 
         </form>
       </div>
