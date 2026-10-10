@@ -153,6 +153,7 @@ h1 > span
     left: 27%;
     top: 15vh;
     display:none;
+    z-index: 1000;
 }
 
 #blackfilter
@@ -164,6 +165,17 @@ h1 > span
     top: 0px;
     left: 0px;
     display:none;
+
+}
+
+#class-list
+{
+    width: 80%;
+    height: 80%;
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    bottom:40px;
+    right: 40px;
 }
 
 
