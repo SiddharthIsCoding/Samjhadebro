@@ -36,6 +36,24 @@ function Dashboard(){
 
       <button className='normalbtn' style={{background:"gray",width:150 , margin:30,marginTop:40}} >+ Create class</button>
 
+
+      <div id="class-form" >
+        <form>
+          <h1 style={{fontSize:30}} >Class details</h1>
+
+          <input placeholder='Topic(s) to be discussed' className='inputbox' type='text' id='topic' name='topic' ></input>
+          <br></br>
+          <input placeholder='Venue of discussion 📍 ' className='inputbox' type='text' id='venue' name='venue' ></input>
+          <br></br>
+          <textarea placeholder='Details about the class' style={{height:"20vh",marginTop:20,padding:20}} className='inputbox' >
+          </textarea>
+
+          <br></br>
+
+          <button  className='normalbtn' >Create</button>
+
+        </form>
+      </div>
       
 
 
