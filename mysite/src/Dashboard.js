@@ -53,6 +53,9 @@ function Dashboard(){
           <br></br>
           <input placeholder='Venue of discussion 📍 ' className='inputbox' type='text' id='venue' name='venue' ></input>
           <br></br>
+          <input style={{width:"30%"}} placeholder='Date of discussion 📅 ' className='inputbox' type='date' id='date' name='date' ></input>
+          <input style={{width:"25%",marginLeft:10}} placeholder='Time of discussion ⏰ ' className='inputbox' type='time' id='time' name='time' ></input>
+          <br></br>
           <textarea placeholder='Details about the class' style={{height:"20vh",marginTop:20,padding:20}} className='inputbox' >
           </textarea>
 
