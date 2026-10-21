@@ -6,7 +6,8 @@ function NotFound() {
   return (
     <div>
       <Nav></Nav>
-      <h1>404 Page Not Found</h1>
+      <br></br>
+      <h1>404 <br></br>Page Not Found...</h1>
       <Footer></Footer>
     </div>
   );

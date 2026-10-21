@@ -11,12 +11,14 @@ import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Dashboard from './Dashboard';
 
 
+
 function Home() {
   return (
     <div>
       <Nav></Nav>
 
       <h1>Welcome to <br></br> <span>" SamjhadeBro "</span> </h1>
+
 
       <Link to="/login" ><Normalbutton link="/login" txt="Login"></Normalbutton></Link>
       <Link to="/signup" ><Normalbutton link="/signup" txt="Signup"></Normalbutton></Link>
