@@ -20,7 +20,7 @@ h1 > span
 
 .normalbtn
 {
-    width: 100px;
+    min-width: 100px;
     height: 45px;
     border: none;
     outline: none;
@@ -28,14 +28,14 @@ h1 > span
     color: white;
     font-size: 20px;
     border-radius: 10px;
-    background: rgb(34, 34, 194);
+    background: rgb(174, 128, 43);
     transition: 0.3s;
     margin: 20px;
 }
 
 .normalbtn:hover
 {
-    background: rgb(17, 17, 125);
+    background: rgb(123, 89, 26);
 }
 
 
@@ -177,6 +177,11 @@ h1 > span
     z-index:10;
     bottom:40px;
     right: 40px;
+}
+
+.main > p
+{
+    font-size: 23px;
 }
 
 

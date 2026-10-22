@@ -4,7 +4,7 @@ function Footer()
 {
     return(
         <div class="footer" >
-            Made With 💖 By <a href="https://github.com/SiddharthIsCoding" > Siddharth Mishra </a>
+            Made With 💖 By  Team Newdabyte 
         </div>
     )
 }
