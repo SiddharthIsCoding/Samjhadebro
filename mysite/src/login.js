@@ -39,6 +39,7 @@ function LoginPage(){
                 </form>
 
             </div>
+
             <Footer></Footer>
         </div>
     )

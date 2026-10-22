@@ -22,6 +22,7 @@ function Signup() {
 
 
             alert("account created successfully");
+            window.location.href = "/";
         }
         catch(error){
             alert( error);

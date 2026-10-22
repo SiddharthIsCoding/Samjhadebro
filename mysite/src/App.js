@@ -9,22 +9,25 @@ import NotFound from './404';
 import {useEffect , useState} from "react";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Dashboard from './Dashboard';
-
+import Test from './Test';
 
 
 function Home() {
   return (
-    <div>
-      <Nav></Nav>
+      <div className="main"  >
+          <br></br>
+          <h1>AnnaRakshak</h1>
+          <p>A simply transparent and reliable inventory management system</p>
+          <Link to="/login">
+            <button className='normalbtn' >Login</button>
+          </Link>
+          <Link to="/status">
+            <button className='normalbtn' >Check Status</button>
+          </Link>
 
-      <h1>Welcome to <br></br> <span>" SamjhadeBro "</span> </h1>
+          <Footer></Footer>
 
-
-      <Link to="/login" ><Normalbutton link="/login" txt="Login"></Normalbutton></Link>
-      <Link to="/signup" ><Normalbutton link="/signup" txt="Signup"></Normalbutton></Link>
-
-      <Footer></Footer>
-    </div>
+      </div>
   )
 }
 
@@ -57,9 +60,10 @@ function App() {
 
           <Route path="/login" element={<LoginPage></LoginPage>} ></Route>
 
-          <Route path="/signup" element={<Signup></Signup>} ></Route>
 
           <Route path="*" element = {<NotFound></NotFound>} ></Route>
+
+          <Route path="/test" element = {<Test></Test>} ></Route>
         </Routes>
 
   </BrowserRouter>
