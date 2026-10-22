@@ -5,6 +5,7 @@ import Footer from "./footer";
 import { auth, db } from "./firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { ResponsiveContainer, PieChart, Cell , Pie ,Legend ,  Tooltip} from 'recharts';
 
 function Dashboard() {
     const [userName, setUserName] = useState("");
@@ -46,6 +47,15 @@ function Dashboard() {
         return () => unsubscribe();
     }, []);
 
+
+const pieData = [
+  { name: '0 - 30 days', value: 6, percentage: '33%', color: '#22C55E' },
+  { name: '31 - 60 days', value: 5, percentage: '28%', color: '#2563EB' },
+  { name: '61 - 90 days', value: 4, percentage: '22%', color: '#F59E0B' },
+  { name: '> 90 days', value: 3, percentage: '17%', color: '#EF4444' },
+];
+
+
     return (
         <div style={{ textAlign: "left" }} >
             <Nav />
@@ -84,7 +94,57 @@ function Dashboard() {
                 </form>
             </div>
 
-            <div id="class-list" ></div>
+<div id="chart">
+  <div className="pie-chart-container">
+    
+    <h1 id='totalbatchesno' >Total Batches in stock : 18</h1>
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={pieData}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="45%"
+          innerRadius={55}
+          outerRadius={85}
+          paddingAngle={4}
+          stroke="none"
+        >
+          {pieData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.color} />
+          ))}
+        </Pie>
+
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "#111c2d",
+            border: "1px solid #34445b",
+            borderRadius: "10px",
+            color: "#f1f5f9",
+            padding: "10px 14px",
+          }}
+          itemStyle={{ color: "#f1f5f9" }}
+          formatter={(value, name) => [`${value} batches`, name]}
+        />
+
+        <Legend
+          verticalAlign="bottom"
+          align="center"
+          iconType="circle"
+          iconSize={8}
+          wrapperStyle={{
+            fontSize: "12px",
+            color: "#c3cede",
+            paddingTop: "10px",
+          }}
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+            
 
             <Footer />
         </div>
