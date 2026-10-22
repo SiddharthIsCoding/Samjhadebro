@@ -15,6 +15,7 @@ import Test from './Test';
 function Home() {
   return (
       <div className="main"  >
+        <Nav></Nav>
           <br></br>
           <h1>AnnaRakshak</h1>
           <p>A simply transparent and reliable inventory management system</p>
@@ -64,6 +65,8 @@ function App() {
           <Route path="*" element = {<NotFound></NotFound>} ></Route>
 
           <Route path="/test" element = {<Test></Test>} ></Route>
+
+          <Route path="/signup" element = {<Signup></Signup>} ></Route>
         </Routes>
 
   </BrowserRouter>

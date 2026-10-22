@@ -48,14 +48,70 @@ h1 > span
     color: white;
 }
 
+#welcomebox
+{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width:150px;
+    min-height:50px;
+    background:linear-gradient(45deg , rgba(255, 255, 255, 0.381),rgba(255,255,255,0.5)), url("profileicon.png");
+    color:black;
+    background-size: cover;
+    background-position: center center;
+    padding:5px;
+    border-radius:10px;
+    text-align:center;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
+#welcomebox:hover
+{
+    background:linear-gradient(45deg , rgba(255, 255, 255, 0.381),rgba(255,255,255,0.5)), url("profileicon.png");
+    color:white;
+    background-size: cover;
+    background-position: center center;
+    padding:5px;
+    border-radius:10px;
+    text-align:center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#welcomebox > h1
+{
+    font-size:20px;
+    font-weight: bold;
+}
+
+#welcombox > p
+{
+    font-size:8px;
+    font-weight: lighter;
+}
+
+
+
+.CommonNav > h3
+{
+    font-size: 16px;
+    float:left;
+    margin-right:50%;
+}
+
+#wlcmtxt
+{
+    font-size: 30px;
+    margin-top: 20px;
+}
 
 
 .CommonNav > ul > a > li
 {
     display: inline-block;
     columns: white;
-    width: 150px;
+    min-width: 150px;
     margin-right: 20px;
     margin-top: 20px;
     height: 30px;
