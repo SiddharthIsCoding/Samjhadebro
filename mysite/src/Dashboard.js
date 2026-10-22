@@ -1,17 +1,18 @@
-import react from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
-import Normalbutton from "./Normalbtn";
 import Nav from './navbar';
 import Footer from "./footer";
-import {auth} from "./firebase";
-import {signOut} from "firebase/auth";
-import {onAuthStateChanged} from "firebase/auth";
+import { auth, db } from "./firebase";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
-function Dashboard(){
-
+function Dashboard() {
+    const [userName, setUserName] = useState("");
+    const [role, setRole] = useState("");
+    const [user, setUser] = useState(null);
 
     const signout = async () => {
-        try{
+        try {
             await signOut(auth);
             alert("Logout successful");
         } catch (error) {
@@ -19,63 +20,75 @@ function Dashboard(){
         }
     };
 
-    const [userName, setUserName] = react.useState("");
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+                setUserName(currentUser.displayName);
 
+                try {
+                    const userDocRef = doc(db, "users", currentUser.uid);
+                    const docSnap = await getDoc(userDocRef);
+                    
+                    if (docSnap.exists()) {
+                        setRole(docSnap.data().role);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user role:", error);
+                }
+            } else {
+                setUserName("");
+                setRole("");
+                setUser(null);
+            }
+        });
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            setUserName(user.displayName);
-        } else{
-          setUserName("")
-        }
-    });
+        return () => unsubscribe();
+    }, []);
 
-  return (
-    <div style={{textAlign:"left"}} >
-      <Nav></Nav>
+    return (
+        <div style={{ textAlign: "left" }} >
+            <Nav />
 
-      <div onClick={() => {
-        document.getElementById('class-form').style.display = 'none';
-        document.getElementById('blackfilter').style.display = 'none';
-      }} id="blackfilter" ></div>
+            <div onClick={() => {
+                document.getElementById('class-form').style.display = 'none';
+                document.getElementById('blackfilter').style.display = 'none';
+            }} id="blackfilter" ></div>
 
-      <button onClick={() => {
-        document.getElementById('class-form').style.display = 'block';
-        document.getElementById('blackfilter').style.display = 'block';
-      }} className='normalbtn' style={{background:"gray",width:150 , margin:30,marginTop:40}} >+ Create class</button>
+            {/* <button onClick={() => {
+                document.getElementById('class-form').style.display = 'block';
+                document.getElementById('blackfilter').style.display = 'block';
+            }} className='normalbtn' style={{ background: "gray", width: 150, margin: 30, marginTop: 40 }} >+ Create class</button> */}
+{/* 
+            <p id="wlcmtxt" > Welcome , {userName}</p>
+            <p>{role}</p> */}
 
+            <div id="class-form" >
+                <form>
+                    <h1 style={{ fontSize: 30 }} >Class details</h1>
 
-      <div id="class-form" >
-        <form>
-          <h1 style={{fontSize:30}} >Class details</h1>
+                    <input placeholder='Topic(s) to be discussed' className='inputbox' type='text' id='topic' name='topic' ></input>
+                    <br></br>
+                    <input placeholder='Venue of discussion 📍 ' className='inputbox' type='text' id='venue' name='venue' ></input>
+                    <br></br>
+                    <input style={{ width: "30%" }} placeholder='Date of discussion 📅 ' className='inputbox' type='date' id='date' name='date' ></input>
+                    <input style={{ width: "25%", marginLeft: 10 }} placeholder='Time of discussion ⏰ ' className='inputbox' type='time' id='time' name='time' ></input>
+                    <br></br>
+                    <textarea placeholder='Details about the class' style={{ height: "20vh", marginTop: 20, padding: 20 }} className='inputbox' >
+                    </textarea>
 
-          <input placeholder='Topic(s) to be discussed' className='inputbox' type='text' id='topic' name='topic' ></input>
-          <br></br>
-          <input placeholder='Venue of discussion 📍 ' className='inputbox' type='text' id='venue' name='venue' ></input>
-          <br></br>
-          <input style={{width:"30%"}} placeholder='Date of discussion 📅 ' className='inputbox' type='date' id='date' name='date' ></input>
-          <input style={{width:"25%",marginLeft:10}} placeholder='Time of discussion ⏰ ' className='inputbox' type='time' id='time' name='time' ></input>
-          <br></br>
-          <textarea placeholder='Details about the class' style={{height:"20vh",marginTop:20,padding:20}} className='inputbox' >
-          </textarea>
+                    <br></br>
 
-          <br></br>
+                    <button className='normalbtn' >Create</button>
 
-          <button className='normalbtn' >Create</button>
+                </form>
+            </div>
 
-        </form>
-      </div>
+            <div id="class-list" ></div>
 
-      <div id="class-list" >
-
-      </div>
-      
-
-
-      <Footer></Footer>
-    </div>
-  )
+            <Footer />
+        </div>
+    );
 }
-
 
 export default Dashboard;
