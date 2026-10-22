@@ -118,11 +118,14 @@ const pieData = [
 
         <Tooltip
           contentStyle={{
-            backgroundColor: "#111c2d",
-            border: "1px solid #34445b",
+            backgroundColor: "#120e0e",
+            border: "1px solid #000000",
             borderRadius: "10px",
             color: "#f1f5f9",
             padding: "10px 14px",
+            width:250,
+            height:50,
+            fontSize:20
           }}
           itemStyle={{ color: "#f1f5f9" }}
           formatter={(value, name) => [`${value} batches`, name]}
