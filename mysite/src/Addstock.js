@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Nav from './navbar';
 import Footer from "./footer";
-import { db } from './firebase';
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from './firebase';
+import { collection, addDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import './App.css';
 
 function Addstock() {
@@ -12,17 +12,16 @@ function Addstock() {
     const [unit, setUnit] = useState("kg");
     const [godown, setGodown] = useState("");
     const [supplier, setSupplier] = useState("");
-    const [received, setReceived] = useState(new Date().toISOString().split('T')[0]); // Default to today
+    const [received, setReceived] = useState(new Date().toISOString().split('T')[0]);
     const [expiry, setExpiry] = useState("");
     const [quality, setQuality] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // Auto-generate batch number when Commodity or Received Date changes
     useEffect(() => {
         if (commodity && received) {
-            const prefix = commodity.substring(0, 3).toUpperCase(); // e.g. "WHE" for Wheat
-            const dateStr = received.replace(/-/g, ''); // e.g. "20261023"
-            const randomSuffix = Math.floor(100 + Math.random() * 900); // 3-digit random sequence
+            const prefix = commodity.substring(0, 3).toUpperCase();
+            const dateStr = received.replace(/-/g, '');
+            const randomSuffix = Math.floor(100 + Math.random() * 900);
             setBatch(`${prefix}-${dateStr}-${randomSuffix}`);
         } else {
             setBatch("");
@@ -34,6 +33,23 @@ function Addstock() {
         setLoading(true);
 
         try {
+            const currentUser = auth.currentUser;
+            let userName = currentUser ? currentUser.displayName || "Godown Manager" : "System";
+            let userRole = "Manager";
+
+            if (currentUser) {
+                try {
+                    const userDocRef = doc(db, "users", currentUser.uid);
+                    const docSnap = await getDoc(userDocRef);
+                    if (docSnap.exists()) {
+                        userName = docSnap.data().name || userName;
+                        userRole = docSnap.data().role || userRole;
+                    }
+                } catch (err) {
+                    console.error("Error fetching user profile:", err);
+                }
+            }
+
             await addDoc(collection(db, "batches"), {
                 batchId: batch,
                 commodity: commodity,
@@ -45,12 +61,13 @@ function Addstock() {
                 receiptDate: received,
                 expiryDate: expiry || null,
                 qualityStatus: quality,
-                createdAt: serverTimestamp()
+                addedBy: userName,
+                addedByRole: userRole,
+                timestamp: serverTimestamp() // Ensures precise sorting
             });
 
             alert(`Stock added successfully! Generated Batch ID: ${batch}`);
             
-            // Reset form
             setCommodity("");
             setBatch("");
             setQuantity("");
@@ -71,7 +88,6 @@ function Addstock() {
     return (
         <div style={{ textAlign: "left", minHeight: "100vh", position: "relative", paddingBottom: "60px" }}>
             <Nav />
-
             <main className="container">
                 <div className="heading">
                     <h1>Add New Stock</h1>
@@ -215,12 +231,9 @@ function Addstock() {
                     </div>
                 </form>
             </main>
-
             <Footer />
         </div>
     );
 }
-
-Addstock.displayName = "Addstock";
 
 export default Addstock;

@@ -661,6 +661,85 @@ h1 > span
     border-color: rgba(244, 67, 54, 0.4);
 }
 
+
+/* Activity Logs Styling */
+.logs-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.log-item {
+    background: #1b1616;
+    border: 1px solid #333;
+    border-left: 4px solid rgb(174, 128, 43);
+    padding: 18px 20px;
+    border-radius: 8px;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.log-item:hover {
+    border-color: #555;
+    transform: translateY(-2px);
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.log-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-add {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.badge-dispatch {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.4);
+}
+
+.log-time {
+    font-size: 12px;
+    color: #8294aa;
+}
+
+.log-title {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.log-details {
+    margin: 0;
+    font-size: 14px;
+    color: #b0bec5;
+}
+
+.log-footer {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed #333;
+    font-size: 13px;
+    color: #8294aa;
+}
+
+.log-user strong {
+    color: rgb(210, 160, 60);
+}
+
 @media only screen and (max-width: 768px) {
     .inventory-controls {
         flex-direction: column;

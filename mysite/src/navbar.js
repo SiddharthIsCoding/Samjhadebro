@@ -58,6 +58,7 @@ function Nav(props){
             <ul>
                 <Link to="/"><li>Dashboard</li></Link>
                 <Link to="/inventory"><li>Manage Inventory</li></Link>
+                <Link to="/logs"><li>Activity log</li></Link>
                 <Link to="/addstock"><li>Add Stock</li></Link>
                 <Link to="/dispatch"><li>Dispatch</li></Link>
                 {user?(<Link to="/profile"><li>Profile</li></Link>):("")}
