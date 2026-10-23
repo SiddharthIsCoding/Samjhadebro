@@ -18,14 +18,15 @@ import Profile from './profile';
 import Inventory from './inventory';
 import Logs from './logs';
 import BatchView from './BatchView';
+import Status from './status';
 
 function Home() {
     return (
         <div className="main">
             <Nav />
             <br />
-            <h1>AnnaRakshak</h1>
-            <p>A simply transparent and reliable inventory management system</p>
+            <h1><span style={{color:"rgb(174, 128, 43)"}} >अन्न</span>Rakshak</h1>
+            <p>TRANSPARENCY . TRACEABILITY . ACCOUNTABILITY </p>
             <Link to="/login">
                 <button className='normalbtn'>Login</button>
             </Link>
@@ -171,7 +172,8 @@ function App() {
 
                  <Route path="/batch/:id" element={<BatchView />} />
 
-                {/* Fallbacks */}
+                 <Route path='/status' element={<Status/>} />
+
                 <Route path="/test" element={<Test />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

@@ -19,6 +19,8 @@ h1 > span
     color: brown;
 }
 
+
+
 .normalbtn
 {
     min-width: 100px;
@@ -739,6 +741,212 @@ h1 > span
 
 .log-user strong {
     color: rgb(210, 160, 60);
+}
+
+.status-page-wrapper {
+    background-color: #1b1616;
+    color: #ffffff;
+    min-height: 100vh;
+    padding-bottom: 60px;
+    text-align: left;
+}
+
+.status-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.status-header {
+    background: #060505;
+    border: 1px solid #282222;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.public-badge {
+    background: rgba(174, 128, 43, 0.2);
+    color: rgb(174, 128, 43);
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.status-header h1 {
+    color: #ffffff;
+    margin: 12px 0 6px 0;
+    font-size: 26px;
+}
+
+.status-header p {
+    color: #8294aa;
+    margin: 0;
+    font-size: 14px;
+}
+
+.section-heading {
+    color: rgb(174, 128, 43);
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* Commodity Summary Cards Grid */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: #060505;
+    border: 1px solid #2d2626;
+    padding: 18px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-left: 4px solid rgb(174, 128, 43);
+}
+
+.comm-title {
+    color: #8294aa;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.comm-qty {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.comm-status {
+    color: #4CAF50;
+    font-size: 11px;
+}
+
+/* Controls */
+.status-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.status-input {
+    flex: 2;
+    min-width: 250px;
+    background: #060505;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.status-select {
+    flex: 1;
+    min-width: 160px;
+    background: #060505;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.status-input:focus, .status-select:focus {
+    outline: none;
+    border-color: rgb(174, 128, 43);
+}
+
+/* Table Cards */
+.status-card-table {
+    background: #060505;
+    border: 1px solid #282222;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.public-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.public-table th {
+    color: #8294aa;
+    border-bottom: 2px solid #222;
+    padding: 12px;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.public-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #1c1818;
+}
+
+.batch-id-cell {
+    color: rgb(174, 128, 43);
+    font-weight: bold;
+}
+
+.qty-cell {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.badge-eligible {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.badge-success {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.badge-warning {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ff9800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.inspect-link {
+    color: rgb(174, 128, 43);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.inspect-link:hover {
+    text-decoration: underline;
+}
+
+.loading-text, .no-data {
+    color: #8294aa;
+    padding: 20px 0;
 }
 
 @media only screen and (max-width: 768px) {
