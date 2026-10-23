@@ -17,6 +17,7 @@ import Dispatch from './dispatch';
 import Profile from './profile';
 import Inventory from './inventory';
 import Logs from './logs';
+import BatchView from './BatchView';
 
 function Home() {
     return (
@@ -167,6 +168,8 @@ function App() {
                          </ProtectedRoute>
                      } 
                  />
+
+                 <Route path="/batch/:id" element={<BatchView />} />
 
                 {/* Fallbacks */}
                 <Route path="/test" element={<Test />} />

@@ -142,9 +142,7 @@ function Dispatch() {
         <div style={{ textAlign: "left", minHeight: "100vh", position: "relative", paddingBottom: "60px" }}>
             <Nav />
             <main className="container">
-                <div className="heading">
-                    <h1>Dispatch Stock (iPDS)</h1>
-                </div>
+
 
                 <form className="form-card" onSubmit={handleSubmit}>
                     <h2 className="section-title">FIFO Allocation & Delivery Challan</h2>

@@ -16,6 +16,9 @@ function Addstock() {
     const [expiry, setExpiry] = useState("");
     const [quality, setQuality] = useState("");
     const [loading, setLoading] = useState(false);
+    
+    // QR Code State upon successful stock addition
+    const [successBatchData, setSuccessBatchData] = useState(null);
 
     useEffect(() => {
         if (commodity && received) {
@@ -50,7 +53,7 @@ function Addstock() {
                 }
             }
 
-            await addDoc(collection(db, "batches"), {
+            const docRef = await addDoc(collection(db, "batches"), {
                 batchId: batch,
                 commodity: commodity,
                 quantity: parseFloat(quantity),
@@ -63,11 +66,18 @@ function Addstock() {
                 qualityStatus: quality,
                 addedBy: userName,
                 addedByRole: userRole,
-                timestamp: serverTimestamp() // Ensures precise sorting
+                timestamp: serverTimestamp()
+            });
+
+            setSuccessBatchData({
+                docId: docRef.id,
+                batchId: batch,
+                commodity: commodity
             });
 
             alert(`Stock added successfully! Generated Batch ID: ${batch}`);
             
+            // Reset Form Fields
             setCommodity("");
             setBatch("");
             setQuantity("");
@@ -85,14 +95,36 @@ function Addstock() {
         }
     };
 
+    const batchUrl = successBatchData ? `${window.location.origin}/batch/${successBatchData.docId}` : "";
+    const qrImageUrl = successBatchData ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(batchUrl)}` : "";
+
+    // Handler to download QR code image
+    const handleDownloadQR = async () => {
+        if (!qrImageUrl || !successBatchData) return;
+        try {
+            const response = await fetch(qrImageUrl);
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `QR_${successBatchData.batchId}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            console.error("Error downloading QR code:", error);
+            alert("Could not download QR code image automatically. You can right-click the image to save.");
+        }
+    };
+
     return (
         <div style={{ textAlign: "left", minHeight: "100vh", position: "relative", paddingBottom: "60px" }}>
             <Nav />
-            <main className="container">
-                <div className="heading">
-                    <h1>Add New Stock</h1>
-                </div>
+            <main className="container" style={{ maxWidth: "800px" }}>
 
+
+                {/* Stock Inward Form */}
                 <form className="form-card" onSubmit={handleSubmit}>
                     <h2 className="section-title">Stock Information (Auto-Batching Enabled)</h2>
 
@@ -219,17 +251,64 @@ function Addstock() {
                     </div>
 
                     <div className="buttons">
-                        <button type="reset" className="clear-btn" onClick={() => {
+                        <button type="button" className="clear-btn" onClick={() => {
                             setCommodity(""); setBatch(""); setQuantity(""); setGodown(""); setSupplier(""); setExpiry(""); setQuality("");
                         }}>
                             Clear Form
                         </button>
 
                         <button type="submit" className="save-btn" disabled={loading}>
-                            {loading ? "Saving..." : "Save Stock"}
+                            {loading ? "Saving..." : "Save Stock & Generate QR"}
                         </button>
                     </div>
                 </form>
+
+                {/* Generated QR Code Card rendered BELOW the form */}
+                {successBatchData && (
+                    <div className="form-card" style={{ marginTop: "25px", border: "2px solid rgb(174, 128, 43)", textAlign: "center" }}>
+                        <h2 style={{ color: "rgb(174, 128, 43)", margin: "0 0 10px 0" }}>Consignment QR Generated Successfully!</h2>
+                        <p style={{ color: "#b0bec5", fontSize: "14px", marginBottom: "15px" }}>
+                            Batch ID: <strong>{successBatchData.batchId}</strong> ({successBatchData.commodity})
+                        </p>
+                        
+                        <div style={{ background: "white", padding: "15px", display: "inline-block", borderRadius: "8px" }}>
+                            <img 
+                                src={qrImageUrl} 
+                                alt={`QR Code for ${successBatchData.batchId}`} 
+                                style={{ display: "block", width: "180px", height: "180px" }}
+                            />
+                        </div>
+
+                        <div style={{ marginTop: "15px", display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
+                            <button 
+                                type="button" 
+                                onClick={handleDownloadQR} 
+                                className="save-btn" 
+                                style={{ background: "rgb(174, 128, 43)", width: "auto", padding: "10px 22px" }}
+                            >
+                                📥 Download QR Code
+                            </button>
+                            <a 
+                                href={`/batch/${successBatchData.docId}`} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                style={{ textDecoration: "none" }}
+                            >
+                                <button 
+                                    type="button" 
+                                    className="save-btn" 
+                                    style={{ background: "#333", width: "auto", padding: "10px 22px" }}
+                                >
+                                    🔗 Open Inspection View
+                                </button>
+                            </a>
+                        </div>
+                        
+                        <p style={{ color: "#8294aa", fontSize: "12px", marginTop: "15px", wordBreak: "break-all" }}>
+                            Target Link: {batchUrl}
+                        </p>
+                    </div>
+                )}
             </main>
             <Footer />
         </div>
