@@ -1,9 +1,14 @@
 import react from 'react';
+import Nav from './navbar';
+import Footer from './footer';
 
 function Addstock(){
     return(
   
   <div>
+    <Nav></Nav>
+
+
 
 
   <main class="container">
@@ -128,6 +133,8 @@ function Addstock(){
   </main>
 
         
+
+        <Footer></Footer>
         
         </div>
     )

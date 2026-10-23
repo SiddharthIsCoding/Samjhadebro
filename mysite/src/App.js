@@ -13,6 +13,7 @@ import Test from './Test';
 import {auth , db } from './firebase';
 import {doc , getDoc} from 'firebase/firestore';
 import Addstock from './Addstock';
+import Dispatch from './dispatch';
 
 function Home() {
   return (
@@ -81,7 +82,11 @@ function App() {
           <Route path="/login" element={<LoginPage></LoginPage>} ></Route>
 
           <Route path="/signup" element={<Signup></Signup>} ></Route>
+
           <Route path="/addstock" element={<Addstock></Addstock>} ></Route>
+
+          <Route path="/dispatch" element={<Dispatch></Dispatch>} ></Route>
+
 
 
 

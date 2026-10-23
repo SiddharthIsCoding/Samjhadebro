@@ -1,5 +1,4 @@
 import react from "react";
-import LoginPage from "./login";
 import {Link} from "react-router-dom";
 import {useState , useEffect} from "react";
 import {getAuth , onAuthStateChanged} from "firebase/auth";
@@ -59,8 +58,8 @@ function Nav(props){
             <ul>
                 <Link to="/"><li>Dashboard</li></Link>
                 <Link to="/about"><li>Manage Inventory</li></Link>
-                <Link to="/about"><li>Add Stock</li></Link>
-                <Link to="/contact"><li>Dispatch</li></Link>
+                <Link to="/addstock"><li>Add Stock</li></Link>
+                <Link to="/dispatch"><li>Dispatch</li></Link>
                 {user?(<Link to="/profile"><li>Profile</li></Link>):("")}
             </ul>
         </div>
