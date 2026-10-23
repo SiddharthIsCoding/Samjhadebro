@@ -592,6 +592,82 @@ h1 > span
     font-weight: 500;
 }
 
+
+/* Inventory Page Controls & Tables */
+.inventory-controls {
+    display: flex;
+    gap: 15px;
+    padding: 20px !important;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search-group {
+    flex: 2;
+}
+
+.filter-group {
+    flex: 1;
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    margin-top: 10px;
+}
+
+.inventory-table th {
+    background: #1b1616;
+    color: #8294aa;
+    font-size: 13px;
+    text-transform: uppercase;
+    padding: 12px 15px;
+    border-bottom: 2px solid #333;
+}
+
+.inventory-table td {
+    padding: 12px 15px;
+    font-size: 14px;
+    color: #ffffff;
+    border-bottom: 1px solid #222;
+}
+
+.inventory-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.status-badge.pending {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border-color: rgba(255, 152, 0, 0.4);
+}
+
+.status-badge.rejected {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border-color: rgba(244, 67, 54, 0.4);
+}
+
+@media only screen and (max-width: 768px) {
+    .inventory-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
 @media only screen and (max-width: 768px) {
     .details-grid {
         grid-template-columns: 1fr;

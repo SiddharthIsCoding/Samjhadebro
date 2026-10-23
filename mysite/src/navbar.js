@@ -57,7 +57,7 @@ function Nav(props){
             {user?(<div id='welcomebox' ><h1>{user.displayName}</h1>  <p>{role}</p> </div>):("")}
             <ul>
                 <Link to="/"><li>Dashboard</li></Link>
-                <Link to="/about"><li>Manage Inventory</li></Link>
+                <Link to="/inventory"><li>Manage Inventory</li></Link>
                 <Link to="/addstock"><li>Add Stock</li></Link>
                 <Link to="/dispatch"><li>Dispatch</li></Link>
                 {user?(<Link to="/profile"><li>Profile</li></Link>):("")}
