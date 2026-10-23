@@ -14,12 +14,9 @@ function Dispatch() {
             <Nav />
 
             <main className="container">
-                <div className="heading">
-                    <h1>Dispatch Stock</h1>
-                </div>
 
                 <form className="form-card" onSubmit={handleSubmit}>
-                    <h2 className="section-title">FIFO Allocation & Delivery Challan</h2>
+                    <h2 className="section-title">Dispatch details & Delivery Challan</h2>
 
                     <div className="form-grid">
                         <div className="field">

@@ -14,6 +14,7 @@ import {auth , db } from './firebase';
 import {doc , getDoc} from 'firebase/firestore';
 import Addstock from './Addstock';
 import Dispatch from './dispatch';
+import Profile from './profile';
 
 function Home() {
   return (
@@ -86,6 +87,9 @@ function App() {
           <Route path="/addstock" element={<Addstock></Addstock>} ></Route>
 
           <Route path="/dispatch" element={<Dispatch></Dispatch>} ></Route>
+
+          <Route path="/profile" element={<Profile> </Profile>} ></Route>
+
 
 
 
