@@ -10,11 +10,14 @@ import {useEffect , useState} from "react";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Dashboard from './Dashboard';
 import Test from './Test';
+import {auth , db } from './firebase';
+import {doc , getDoc} from 'firebase/firestore';
 
 
 function Home() {
   return (
       <div className="main"  >
+        <Nav></Nav>
           <br></br>
           <h1>AnnaRakshak</h1>
           <p>A simply transparent and reliable inventory management system</p>
@@ -37,18 +40,35 @@ function App() {
 
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
+  const [role,setRole] = useState("");
 
-    return () => unsubscribe();
-  }, []);
+  const [UserName,setUserName] = useState("");
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+                setUserName(currentUser.displayName);
+
+                try {
+                    const userDocRef = doc(db, "users", currentUser.uid);
+                    const docSnap = await getDoc(userDocRef);
+                    
+                    if (docSnap.exists()) {
+                        setRole(docSnap.data().role);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user role:", error);
+                }
+            } else {
+                setUserName("");
+                setRole("");
+                setUser(null);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
 
 
@@ -56,9 +76,12 @@ function App() {
     <BrowserRouter>
      
         <Routes>
-          <Route path="/" element={user?(<Dashboard></Dashboard>):(<Home></Home>)} ></Route>
+          <Route path="/" element={user&&role=="admin"?(<Dashboard></Dashboard>):(<Home></Home>)} ></Route>
 
           <Route path="/login" element={<LoginPage></LoginPage>} ></Route>
+
+          <Route path="/signup" element={<Signup></Signup>} ></Route>
+
 
 
           <Route path="*" element = {<NotFound></NotFound>} ></Route>

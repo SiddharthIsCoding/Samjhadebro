@@ -2,13 +2,16 @@ import react from "react";
 import Nav from "./navbar";
 import Footer from "./footer";
 import { createUserWithEmailAndPassword , updateProfile } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth , db } from "./firebase";
+import {setDoc , doc} from "firebase/firestore";
+
 
 function Signup() {
 
     const [email, setEmail] = react.useState("");
     const [password, setPassword] = react.useState("");
     const [name, setName] = react.useState("");
+    const [role, setRole] = react.useState("");
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -18,6 +21,12 @@ function Signup() {
 
             await updateProfile(credential.user, {
                 displayName: name
+            });
+
+            await setDoc(doc(db, "users", credential.user.uid), {
+                name: name,
+                email: email,
+                role: role
             });
 
 
@@ -34,10 +43,11 @@ function Signup() {
     return (
         <div class="loginpage" >
             <Nav></Nav>
-            <div class="loginform" >
+            <div class="loginform"  style={{marginTop:"2vh"}}  >
                 <h1>Signup </h1>
                 <form onSubmit={handleSignup}> 
                     <input name="name" class="inputbox" type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} ></input><br></br>
+                    <input name="role" class="inputbox" type="text" placeholder="Role" value={role} onChange={(e) => setRole(e.target.value)} ></input><br></br>
                     <input name="email" class="inputbox" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} ></input><br></br>
                     <input name="password" class="inputbox" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} ></input><br></br>
                     <button class="normalbtn" type="submit" >Signup</button>
