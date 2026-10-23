@@ -55,7 +55,7 @@ function Nav(props){
         <div className="CommonNav" >
             {/* {user?(<button style={{background:"red",position:"absolute",left:10,top:10}} class="normalbtn" onClick={signout} >Logout</button>):(<Link to="/login" ><button style={{position:"absolute",left:10,top:10}} class="normalbtn">Login</button></Link>)} */}
 
-            {user?(<div id='welcomebox' ><h1>{user.displayName}</h1> <br></br> <p>{role}</p> </div>):("")}
+            {user?(<div id='welcomebox' ><h1>{user.displayName}</h1>  <p>{role}</p> </div>):("")}
             <ul>
                 <Link to="/"><li>Dashboard</li></Link>
                 <Link to="/about"><li>Manage Inventory</li></Link>
