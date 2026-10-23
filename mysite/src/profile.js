@@ -179,9 +179,7 @@ function Profile() {
 
                 <section className="form-card profile-section logout-card" style={{ marginTop: "25px", borderLeft: "5px solid #d32f2f" }}>
                     <h2 className="section-title" style={{ color: "#ef5350" }}>Session Management</h2>
-                    <p style={{ color: "#b0bec5", fontSize: "14px", marginBottom: "20px" }}>
-                        Sign out securely from your account when you have finished managing godown stocks.
-                    </p>
+
                     <button onClick={handleLogout} className="save-btn" style={{ background: "#c62828" }}>
                         Logout System
                     </button>

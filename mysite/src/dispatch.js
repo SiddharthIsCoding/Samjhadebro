@@ -8,16 +8,17 @@ import './App.css';
 function Dispatch() {
     const [commodity, setCommodity] = useState("");
     const [availableBatches, setAvailableBatches] = useState([]);
-    const [selectedBatchId, setSelectedBatchId] = useState("");
     const [dispatchQty, setDispatchQty] = useState("");
     const [destinationFps, setDestinationFps] = useState("");
     const [loadingBatches, setLoadingBatches] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Fetch eligible, non-expired batches sorted by FIFO (oldest first)
     useEffect(() => {
         if (!commodity) {
             setAvailableBatches([]);
-            setSelectedBatchId("");
             return;
         }
 
@@ -34,10 +35,15 @@ function Dispatch() {
 
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    const remaining = parseFloat(data.remainingQuantity);
-                    const isEligible = !data.qualityStatus || data.qualityStatus.toLowerCase() === "eligible";
+                    const remaining = parseFloat(data.remainingQuantity) || 0;
+                    const status = (data.qualityStatus || "").toLowerCase();
+                    const isEligible = status === "eligible";
 
-                    if (remaining > 0 && isEligible) {
+                    // Case 3 Guardrail: Exclude expired stock
+                    const expiry = data.expiryDate;
+                    const isExpired = expiry && expiry < todayStr;
+
+                    if (remaining > 0 && isEligible && !isExpired) {
                         batchList.push({
                             id: docSnap.id,
                             ...data,
@@ -46,14 +52,9 @@ function Dispatch() {
                     }
                 });
 
+                // Sort oldest receipt date first (FIFO)
                 batchList.sort((a, b) => new Date(a.receiptDate) - new Date(b.receiptDate));
                 setAvailableBatches(batchList);
-
-                if (batchList.length > 0) {
-                    setSelectedBatchId(batchList[0].id);
-                } else {
-                    setSelectedBatchId("");
-                }
             } catch (error) {
                 console.error("Error fetching batches for dispatch: ", error);
             } finally {
@@ -62,25 +63,42 @@ function Dispatch() {
         };
 
         fetchBatches();
-    }, [commodity]);
+    }, [commodity, todayStr]);
+
+    // Calculate total stock available across all eligible batches for this commodity
+    const totalAvailableStock = availableBatches.reduce((acc, b) => acc + b.remainingQuantity, 0);
+    const requestedQty = parseFloat(dispatchQty) || 0;
+
+    // Preview FIFO multi-batch allocation breakdown as user types quantity
+    const getBatchAllocationPreview = () => {
+        if (requestedQty <= 0 || availableBatches.length === 0) return [];
+        let remainingToAllocate = requestedQty;
+        const allocation = [];
+
+        for (let batch of availableBatches) {
+            if (remainingToAllocate <= 0) break;
+            const take = Math.min(batch.remainingQuantity, remainingToAllocate);
+            allocation.push({
+                batchId: batch.batchId,
+                amount: take,
+                unit: batch.unit || 'kg'
+            });
+            remainingToAllocate -= take;
+        }
+        return allocation;
+    };
+
+    const allocationPreview = getBatchAllocationPreview();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!selectedBatchId) {
-            alert("Please select a valid batch.");
+        if (requestedQty <= 0) {
+            alert("Please enter a valid dispatch quantity.");
             return;
         }
 
-        const chosenBatch = availableBatches.find(b => b.id === selectedBatchId);
-        const qtyToDispatch = parseFloat(dispatchQty);
-
-        if (!chosenBatch) {
-            alert("Batch not found.");
-            return;
-        }
-
-        if (qtyToDispatch > chosenBatch.remainingQuantity) {
-            alert(`Requested quantity (${qtyToDispatch} kg) exceeds available batch stock (${chosenBatch.remainingQuantity} kg).`);
+        if (requestedQty > totalAvailableStock) {
+            alert(`Requested quantity (${requestedQty} kg) exceeds total available eligible stock (${totalAvailableStock} kg).`);
             return;
         }
 
@@ -104,34 +122,48 @@ function Dispatch() {
                 }
             }
 
+            // Perform Multi-Batch FIFO Allocation Loop (Case 1)
+            let remNeeded = requestedQty;
+            const batchBreakdownSummary = [];
+
+            for (let batch of availableBatches) {
+                if (remNeeded <= 0) break;
+
+                const takeQty = Math.min(batch.remainingQuantity, remNeeded);
+                const newRemaining = batch.remainingQuantity - takeQty;
+
+                // Update individual batch document remaining stock in Firestore
+                const batchRef = doc(db, "batches", batch.id);
+                await updateDoc(batchRef, { remainingQuantity: newRemaining });
+
+                batchBreakdownSummary.push(`${takeQty} kg from Batch ${batch.batchId}`);
+                remNeeded -= takeQty;
+            }
+
+            const breakdownText = batchBreakdownSummary.join(" + ");
+
+            // Record consolidated dispatch audit entry
             await addDoc(collection(db, "dispatches"), {
                 commodity: commodity,
-                batchDocId: chosenBatch.id,
-                batchId: chosenBatch.batchId,
-                quantityDispatched: qtyToDispatch,
+                quantityDispatched: requestedQty,
                 destinationFps: destinationFps,
-                dispatchDate: new Date().toISOString().split('T')[0],
+                dispatchDate: todayStr,
+                batchBreakdown: batchBreakdownSummary,
+                dispatchSummaryText: `Dispatched ${requestedQty} kg total (${breakdownText}) to ${destinationFps}`,
                 dispatchedBy: userName,
                 dispatchedByRole: userRole,
-                timestamp: serverTimestamp() // Ensures precise sorting
+                timestamp: serverTimestamp()
             });
 
-            const batchRef = doc(db, "batches", chosenBatch.id);
-            const newRemaining = chosenBatch.remainingQuantity - qtyToDispatch;
+            alert(`Stock dispatched successfully via FIFO chain!\nBreakdown: ${breakdownText}\nDestination: ${destinationFps}`);
 
-            await updateDoc(batchRef, {
-                remainingQuantity: newRemaining
-            });
-
-            alert(`Stock dispatched successfully!\nBatch ${chosenBatch.batchId} updated. Remaining stock: ${newRemaining} ${chosenBatch.unit || 'kg'}`);
-
+            // Reset Form
             setCommodity("");
-            setSelectedBatchId("");
             setDispatchQty("");
             setDestinationFps("");
             setAvailableBatches([]);
         } catch (error) {
-            console.error("Error performing stock dispatch: ", error);
+            console.error("Error performing split stock dispatch: ", error);
             alert("Failed to process dispatch. Check console for details.");
         } finally {
             setSubmitting(false);
@@ -141,11 +173,15 @@ function Dispatch() {
     return (
         <div style={{ textAlign: "left", minHeight: "100vh", position: "relative", paddingBottom: "60px" }}>
             <Nav />
-            <main className="container">
 
+            <main className="container" style={{ maxWidth: "850px" }}>
+                <div className="heading">
+                    <h1>Dispatch Stock (iPDS)</h1>
+                    <p className="dashboard-subtext">Automatic FIFO chain allocation with multi-batch split dispatch support</p>
+                </div>
 
                 <form className="form-card" onSubmit={handleSubmit}>
-                    <h2 className="section-title">FIFO Allocation & Delivery Challan</h2>
+                    <h2 className="section-title">Multi-Batch FIFO Allocation &amp; Delivery Challan</h2>
 
                     <div className="form-grid">
                         <div className="field">
@@ -169,29 +205,10 @@ function Dispatch() {
                         </div>
 
                         <div className="field">
-                            <label htmlFor="batch">Select Batch (FIFO Auto-Prioritized) *</label>
-                            <select 
-                                id="batch" 
-                                className="select" 
-                                value={selectedBatchId}
-                                onChange={(e) => setSelectedBatchId(e.target.value)}
-                                required
-                                disabled={!commodity || loadingBatches}
-                            >
-                                {!commodity ? (
-                                    <option value="">Select commodity first</option>
-                                ) : loadingBatches ? (
-                                    <option value="">Loading batches...</option>
-                                ) : availableBatches.length === 0 ? (
-                                    <option value="">No stock available</option>
-                                ) : (
-                                    availableBatches.map((batchItem, index) => (
-                                        <option key={batchItem.id} value={batchItem.id}>
-                                            {batchItem.batchId} - {batchItem.remainingQuantity} {batchItem.unit || 'kg'} available (Recd: {batchItem.receiptDate}) {index === 0 ? '★ FIFO Recommended' : ''}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
+                            <label>Total Eligible Stock Available</label>
+                            <div className="input" style={{ background: "#110e0e", color: commodity ? "#4CAF50" : "#8294aa", display: "flex", alignItems: "center" }}>
+                                {loadingBatches ? "Calculating..." : commodity ? `${totalAvailableStock} kg across ${availableBatches.length} batch(es)` : "Select commodity first"}
+                            </div>
                         </div>
 
                         <div className="field">
@@ -202,10 +219,11 @@ function Dispatch() {
                                 className="input"
                                 min="0.01"
                                 step="0.01"
-                                placeholder="Enter quantity"
+                                placeholder="Enter total quantity"
                                 value={dispatchQty}
                                 onChange={(e) => setDispatchQty(e.target.value)}
                                 required
+                                disabled={!commodity || availableBatches.length === 0}
                             />
                         </div>
 
@@ -221,6 +239,22 @@ function Dispatch() {
                                 required
                             />
                         </div>
+
+                        {/* Real-time FIFO Multi-Batch Split Allocation Preview */}
+                        {allocationPreview.length > 0 && (
+                            <div className="field full-width" style={{ background: "#110e0e", border: "1px dashed rgb(174, 128, 43)", padding: "15px", borderRadius: "8px" }}>
+                                <label style={{ color: "rgb(174, 128, 43)", fontWeight: "bold", marginBottom: "8px", display: "block" }}>
+                                    ⚡ FIFO Split-Batch Allocation Preview:
+                                </label>
+                                <ul style={{ margin: 0, paddingLeft: "20px", color: "#b0bec5", fontSize: "14px" }}>
+                                    {allocationPreview.map((item, idx) => (
+                                        <li key={idx} style={{ marginBottom: "4px" }}>
+                                            Pulling <strong style={{ color: "#fff" }}>{item.amount} {item.unit}</strong> from <span style={{ color: "rgb(210, 160, 60)" }}>Batch {item.batchId}</span> {idx === 0 ? "(Oldest FIFO)" : `(${idx + 1}${idx === 1 ? 'nd' : idx === 2 ? 'rd' : 'th'} Oldest)`}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
 
                     <div className="buttons">
@@ -229,7 +263,6 @@ function Dispatch() {
                             className="clear-btn"
                             onClick={() => {
                                 setCommodity("");
-                                setSelectedBatchId("");
                                 setDispatchQty("");
                                 setDestinationFps("");
                                 setAvailableBatches([]);
@@ -237,12 +270,14 @@ function Dispatch() {
                         >
                             Clear Form
                         </button>
-                        <button type="submit" className="save-btn" disabled={submitting}>
-                            {submitting ? "Processing..." : "Confirm Dispatch"}
+                        {/* Case 2: Double-Submit Protection */}
+                        <button type="submit" className="save-btn" disabled={submitting || !commodity || availableBatches.length === 0}>
+                            {submitting ? "Processing Dispatch..." : "Confirm Split Dispatch"}
                         </button>
                     </div>
                 </form>
             </main>
+
             <Footer />
         </div>
     );
