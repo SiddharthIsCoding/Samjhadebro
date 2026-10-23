@@ -175,10 +175,7 @@ function Dispatch() {
             <Nav />
 
             <main className="container" style={{ maxWidth: "850px" }}>
-                <div className="heading">
-                    <h1>Dispatch Stock (iPDS)</h1>
-                    <p className="dashboard-subtext">Automatic FIFO chain allocation with multi-batch split dispatch support</p>
-                </div>
+
 
                 <form className="form-card" onSubmit={handleSubmit}>
                     <h2 className="section-title">Multi-Batch FIFO Allocation &amp; Delivery Challan</h2>
@@ -244,7 +241,7 @@ function Dispatch() {
                         {allocationPreview.length > 0 && (
                             <div className="field full-width" style={{ background: "#110e0e", border: "1px dashed rgb(174, 128, 43)", padding: "15px", borderRadius: "8px" }}>
                                 <label style={{ color: "rgb(174, 128, 43)", fontWeight: "bold", marginBottom: "8px", display: "block" }}>
-                                    ⚡ FIFO Split-Batch Allocation Preview:
+                                    FIFO Split-Batch Allocation Preview:
                                 </label>
                                 <ul style={{ margin: 0, paddingLeft: "20px", color: "#b0bec5", fontSize: "14px" }}>
                                     {allocationPreview.map((item, idx) => (
