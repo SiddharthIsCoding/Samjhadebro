@@ -61,6 +61,7 @@ function Nav(props){
                 <Link to="/logs"><li>Activity log</li></Link>
                 <Link to="/addstock"><li>Add Stock</li></Link>
                 <Link to="/dispatch"><li>Dispatch</li></Link>
+                <Link to="/forecast"><li>Forecast</li></Link>
                 {user?(<Link to="/profile"><li>Profile</li></Link>):("")}
             </ul>
         </div>

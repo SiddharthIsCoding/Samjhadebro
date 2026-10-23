@@ -19,6 +19,7 @@ import Inventory from './inventory';
 import Logs from './logs';
 import BatchView from './BatchView';
 import Status from './status';
+import AIForecast from './aiforecast';
 
 function Home() {
     return (
@@ -170,11 +171,16 @@ function App() {
                      } 
                  />
 
+                 <Route path='/forecast' element={<AIForecast/>}/>
+
                  <Route path="/batch/:id" element={<BatchView />} />
 
                  <Route path='/status' element={<Status/>} />
 
                 <Route path="/test" element={<Test />} />
+
+
+
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>

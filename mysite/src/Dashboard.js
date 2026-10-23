@@ -10,6 +10,7 @@ import {
   PieChart, Pie, Cell, Legend 
 } from 'recharts';
 
+
 // Helper function for browser desktop push notifications
 const triggerDesktopNotification = (title, body) => {
     if ("Notification" in window) {
@@ -187,7 +188,7 @@ function Dashboard() {
                         title: "Critical FIFO Compliance Warning",
                         message: msg
                     });
-                    triggerDesktopNotification("🚨 FIFO Compliance Alert", msg);
+                    triggerDesktopNotification("FIFO Compliance Alert", msg);
                 }
 
                 // Alert 2: Aged Stock (>90 Days)
@@ -198,6 +199,16 @@ function Dashboard() {
                         title: "Aged Stock Risk Alert",
                         message: msg
                     });
+                }
+
+                if(age31_60 > 0){
+                  const msg = `There are ${age31_60} active batch(es) stored for more than 30 days without dispatch`;
+
+                  activeAlerts.push({
+                    type:"warning",
+                    title:"Age Stock Alert",
+                    message:msg
+                  })
                 }
 
                 // Alert 3: Expired Stock Hazard
@@ -211,7 +222,6 @@ function Dashboard() {
                     triggerDesktopNotification("⚠️ Expired Stock Warning", msg);
                 }
 
-                // Alert 4: Low Total Reserve Warning
                 if (totalQty > 0 && totalQty < 500) {
                     const msg = `Total stock volume has dropped to ${totalQty} kg. Reorder requisition recommended.`;
                     activeAlerts.push({
@@ -273,7 +283,7 @@ function Dashboard() {
                 <div style={{ maxWidth: "1240px", margin: "0 auto 25px auto", padding: "0 20px" }}>
                     <div style={{ background: "#0e0b0b", border: "1px solid #333", borderRadius: "10px", padding: "20px" }}>
                         <h3 style={{ margin: "0 0 15px 0", color: "#fff", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                            🚨 System Alert Center ({alerts.length})
+                             System Alert Center ({alerts.length})
                         </h3>
                         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                             {alerts.map((alert, idx) => (

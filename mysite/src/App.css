@@ -949,6 +949,19 @@ h1 > span
     padding: 20px 0;
 }
 
+/* Fix Recharts axis label and legend overlap */
+.recharts-wrapper {
+    overflow: visible !important;
+}
+
+.recharts-legend-wrapper {
+    padding-top: 15px !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+    fill: #8294aa !important;
+}
+
 @media only screen and (max-width: 768px) {
     .inventory-controls {
         flex-direction: column;
