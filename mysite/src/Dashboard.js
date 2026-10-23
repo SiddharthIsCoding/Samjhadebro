@@ -19,8 +19,13 @@ function Dashboard() {
     const [totalBatches, setTotalBatches] = useState(0);
     const [totalStockKg, setTotalStockKg] = useState(0);
     const [fifoCompliance, setFifoCompliance] = useState("100%");
+    const [complianceNum, setComplianceNum] = useState(100);
+    
     const [pendingDispatches, setPendingDispatches] = useState(0);
     const [loading, setLoading] = useState(true);
+
+    // Alert states
+    const [alerts, setAlerts] = useState([]);
 
     const [stockData, setStockData] = useState([]);
     const [batchAgeData, setBatchAgeData] = useState([
@@ -55,10 +60,14 @@ function Dashboard() {
         return () => unsubscribe();
     }, []);
 
-    // Fetch live dashboard data from Firestore
+    // Fetch live dashboard data from Firestore & evaluate alert triggers
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
+                const activeAlerts = [];
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+
                 // 1. Fetch Batches
                 const batchesSnap = await getDocs(collection(db, "batches"));
                 let batchCount = 0;
@@ -69,8 +78,7 @@ function Dashboard() {
                 let age31_60 = 0;
                 let age61_90 = 0;
                 let age90Plus = 0;
-
-                const today = new Date();
+                let expiredCount = 0;
 
                 batchesSnap.forEach((docSnap) => {
                     const data = docSnap.data();
@@ -83,6 +91,11 @@ function Dashboard() {
                         // Aggregate quantity by commodity
                         const comm = data.commodity || "Other";
                         commodityTotals[comm] = (commodityTotals[comm] || 0) + remQty;
+
+                        // Expiry Check
+                        if (data.expiryDate && data.expiryDate < todayStr) {
+                            expiredCount++;
+                        }
 
                         // Calculate batch age in days based on receiptDate
                         if (data.receiptDate) {
@@ -118,16 +131,69 @@ function Dashboard() {
                     { name: '> 90 days', value: age90Plus, color: '#f44336' }
                 ]);
 
-                // 2. Fetch Dispatches count
+                // 2. Fetch Dispatches & Calculate FIFO Compliance
                 const dispatchesSnap = await getDocs(collection(db, "dispatches"));
                 setPendingDispatches(dispatchesSnap.size);
 
-                // Calculate FIFO compliance based on aged batches (>90 days reduce score)
-                if (batchCount > 0) {
-                    const nonCompliant = age90Plus;
-                    const complianceRate = Math.max(0, Math.round(((batchCount - nonCompliant) / batchCount) * 100));
-                    setFifoCompliance(`${complianceRate}%`);
+                let dispatchCount = 0;
+                let fifoBypassedCount = 0;
+
+                dispatchesSnap.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    dispatchCount += 1;
+                    
+                    if (data.isFifoBypassed === true || (data.fifoExceptionReason && !data.fifoExceptionReason.startsWith("N/A"))) {
+                        fifoBypassedCount += 1;
+                    }
+                });
+
+                let currentCompliance = 100;
+                if (dispatchCount > 0) {
+                    const compliantCount = dispatchCount - fifoBypassedCount;
+                    currentCompliance = Math.max(0, Math.round((compliantCount / dispatchCount) * 100));
                 }
+                
+                setComplianceNum(currentCompliance);
+                setFifoCompliance(`${currentCompliance}%`);
+
+                // --- EVALUATE SYSTEM ALERTS ---
+                // Alert 1: FIFO Compliance below 90%
+                if (currentCompliance < 90) {
+                    activeAlerts.push({
+                        type: "danger",
+                        title: "Critical FIFO Compliance Warning",
+                        message: `FIFO adherence has dropped to ${currentCompliance}% (Below target threshold of 90%). Too many dispatches are bypassing older batches.`
+                    });
+                }
+
+                // Alert 2: Too Old Stocks (>90 Days)
+                if (age90Plus > 0) {
+                    activeAlerts.push({
+                        type: "warning",
+                        title: "Aged Stock Risk Alert",
+                        message: `There are ${age90Plus} active batch(es) in the warehouse stored for over 90 days. Immediate dispatch or inspection recommended.`
+                    });
+                }
+
+                // Alert 3: Expired Stocks Hazard
+                if (expiredCount > 0) {
+                    activeAlerts.push({
+                        type: "danger",
+                        title: "Expired Stock Hazard",
+                        message: `Detected ${expiredCount} batch(es) that have passed their expiry date. These are locked out of dispatch and require disposal/audit review.`
+                    });
+                }
+
+                // Alert 4: Low Stock Warning (if total stock is very low)
+                if (totalQty > 0 && totalQty < 500) {
+                    activeAlerts.push({
+                        type: "warning",
+                        title: "Low Inventory Reserve",
+                        message: `Total warehouse stock has dipped to ${totalQty} kg. Consider raising inward requisitions soon.`
+                    });
+                }
+
+                setAlerts(activeAlerts);
 
             } catch (error) {
                 console.error("Error loading dashboard metrics: ", error);
@@ -150,9 +216,6 @@ function Dashboard() {
                 if (filter) filter.style.display = 'none';
             }} id="blackfilter"></div>
 
-            {/* Dashboard Header Banner */}
-
-
             {/* KPI Summary Cards Grid */}
             <div className="kpi-grid">
                 <div className="kpi-card" style={{ borderLeft: "5px solid rgb(174, 128, 43)" }}>
@@ -165,9 +228,9 @@ function Dashboard() {
                     <h2>{loading ? "..." : `${totalStockKg.toLocaleString()} kg`}</h2>
                     <p>Across all commodities</p>
                 </div>
-                <div className="kpi-card" style={{ borderLeft: "5px solid #1976d2" }}>
+                <div className="kpi-card" style={{ borderLeft: `5px solid ${complianceNum < 90 ? '#f44336' : '#1976d2'}` }}>
                     <h4>FIFO Compliance</h4>
-                    <h2>{loading ? "..." : fifoCompliance}</h2>
+                    <h2 style={{ color: complianceNum < 90 ? '#f44336' : 'inherit' }}>{loading ? "..." : fifoCompliance}</h2>
                     <p>Batch rotation adherence</p>
                 </div>
                 <div className="kpi-card" style={{ borderLeft: "5px solid #ffa000" }}>
@@ -176,6 +239,37 @@ function Dashboard() {
                     <p>Challans generated</p>
                 </div>
             </div>
+
+            {/* --- SYSTEM ALERT CENTER --- */}
+            {!loading && alerts.length > 0 && (
+                <div style={{ maxWidth: "1240px", margin: "0 auto 25px auto", padding: "0 20px" }}>
+                    <div style={{ background: "#0e0b0b", border: "1px solid #333", borderRadius: "10px", padding: "20px" }}>
+                        <h3 style={{ margin: "0 0 15px 0", color: "#fff", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                            Critical Alert ({alerts.length})
+                        </h3>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                            {alerts.map((alert, idx) => (
+                                <div 
+                                    key={idx} 
+                                    style={{ 
+                                        background: alert.type === "danger" ? "rgba(244, 67, 54, 0.1)" : "rgba(255, 160, 0, 0.1)",
+                                        borderLeft: `4px solid ${alert.type === "danger" ? "#f44336" : "#ffa000"}`,
+                                        padding: "12px 15px",
+                                        borderRadius: "6px"
+                                    }}
+                                >
+                                    <h4 style={{ margin: "0 0 4px 0", color: alert.type === "danger" ? "#ff5252" : "#ffb300", fontSize: "14px" }}>
+                                        {alert.title}
+                                    </h4>
+                                    <p style={{ margin: 0, color: "#ccc", fontSize: "13px", lineHeight: "1.4" }}>
+                                        {alert.message}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Charts Section */}
             <div className="charts-grid">
