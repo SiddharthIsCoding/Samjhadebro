@@ -13,6 +13,7 @@ function Nav(props){
     const [user, setUser] = useState(null);
     const [userName, setUserName] = useState("");
     const [role, setRole] = useState("");
+    const [duty , setDuty] = useState(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -51,7 +52,7 @@ function Nav(props){
 
 
     return(
-        <div class="CommonNav" >
+        <div className="CommonNav" >
             {/* {user?(<button style={{background:"red",position:"absolute",left:10,top:10}} class="normalbtn" onClick={signout} >Logout</button>):(<Link to="/login" ><button style={{position:"absolute",left:10,top:10}} class="normalbtn">Login</button></Link>)} */}
 
             {user?(<div id='welcomebox' ><h1>{user.displayName}</h1> <br></br> <p>{role}</p> </div>):("")}

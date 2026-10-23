@@ -76,7 +76,7 @@ function App() {
     <BrowserRouter>
      
         <Routes>
-          <Route path="/" element={user&&role=="admin"?(<Dashboard></Dashboard>):(<Home></Home>)} ></Route>
+          <Route path="/" element={user&& role && role.toLowerCase()=="admin"?(<Dashboard></Dashboard>):(<Home></Home>)} ></Route>
 
           <Route path="/login" element={<LoginPage></LoginPage>} ></Route>
 

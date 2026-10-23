@@ -94,10 +94,10 @@ const pieData = [
                 </form>
             </div>
 
-<div id="chart">
+<div id="piechart">
   <div className="pie-chart-container">
     
-    <h1 id='totalbatchesno' >Total Batches in stock : 18</h1>
+    <h1 id='totalbatchesno' >Total Bdsdsatches in stock : 18</h1>
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie
@@ -145,6 +145,10 @@ const pieData = [
       </PieChart>
     </ResponsiveContainer>
   </div>
+</div>
+
+<div>
+
 </div>
 
             

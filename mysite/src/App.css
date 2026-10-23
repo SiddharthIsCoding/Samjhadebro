@@ -252,8 +252,8 @@ h1 > span
     padding:10px;
 } */
 
-#chart {
-  width: 100%;
+#piechart {
+  width: 50%;
   max-width: 480px;
   min-width: 0;
   padding: 24px;
