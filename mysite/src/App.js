@@ -165,13 +165,20 @@ function App() {
                 <Route 
                      path="/logs" 
                      element={
-                         <ProtectedRoute user={user} role={role} allowedRoles={["admin", "inspection", "officer"]} loading={loading}>
+                         <ProtectedRoute user={user} role={role} allowedRoles={["admin", "inspector", "manager"]} loading={loading}>
                              <Logs />
                          </ProtectedRoute>
                      } 
                  />
 
-                 <Route path='/forecast' element={<AIForecast/>}/>
+               <Route 
+                     path="/forecast" 
+                     element={
+                         <ProtectedRoute user={user} role={role} allowedRoles={["admin", "inspector", "manager"]} loading={loading}>
+                             <AIForecast/>
+                         </ProtectedRoute>
+                     } 
+                 />
 
                  <Route path="/batch/:id" element={<BatchView />} />
 
