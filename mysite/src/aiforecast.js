@@ -82,6 +82,7 @@ function AIForecast() {
                         predictedDailyConsumption = Math.max(10, Math.round(history[0].qty));
                     }
 
+                    // Calculate stock run-out horizon
                     const daysRemaining = predictedDailyConsumption > 0 
                         ? Math.round(currentStock / predictedDailyConsumption) 
                         : 999;
@@ -157,27 +158,43 @@ function AIForecast() {
                         </div>
 
                         {/* Predictive Line Chart */}
-{/* Predictive Line Chart */}
-<div className="form-card" style={{ padding: "25px" }}>
-    <h2 className="section-title">Next 7 Days ML Projected Stock Depletion Curve</h2>
-    {/* Updated height to 420px to prevent label clipping */}
-    <div style={{ width: "100%", height: "420px" }}>
-        <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={forecastChartData} margin={{ top: 10, right: 30, left: 10, bottom: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="day" stroke="#8294aa" tick={{ fontSize: 12 }} dy={10} />
-                <YAxis stroke="#8294aa" tick={{ fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: "#060505", border: "1px solid #333", color: "#fff", borderRadius: "8px" }} />
-                {/* Added vertical offset wrapper style to legend */}
-                <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }} />
-                <Line type="monotone" dataKey="Wheat" stroke="rgb(174, 128, 43)" strokeWidth={2} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Rice" stroke="#4CAF50" strokeWidth={2} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Sugar" stroke="#1976d2" strokeWidth={2} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Salt" stroke="#9c27b0" strokeWidth={2} dot={{ r: 4 }} />
-            </LineChart>
-        </ResponsiveContainer>
-    </div>
-</div>
+                        <div className="form-card" style={{ padding: "25px" }}>
+                            <h2 className="section-title">Next 7 Days ML Projected Stock Depletion Curve</h2>
+
+                            <div style={{ width: "100%", height: "420px" }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={forecastChartData} margin={{ top: 10, right: 30, left: 10, bottom: 30 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                                        <XAxis dataKey="day" stroke="#8294aa" tick={{ fontSize: 12 }} dy={10} />
+                                        <YAxis stroke="#8294aa" tick={{ fontSize: 12 }} />
+                                        <Tooltip 
+                                            contentStyle={{ 
+                                                background: "#060505", 
+                                                border: "1px solid #333", 
+                                                borderRadius: "8px", 
+                                                padding: "8px 12px" 
+                                            }} 
+                                            itemStyle={{ 
+                                                color: "#fff", 
+                                                fontSize: "12px", 
+                                                padding: "2px 0" 
+                                            }} 
+                                            labelStyle={{ 
+                                                color: "rgb(174, 128, 43)", 
+                                                fontWeight: "bold", 
+                                                fontSize: "13px", 
+                                                marginBottom: "4px" 
+                                            }} 
+                                        />
+                                        <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }} />
+                                        <Line type="monotone" dataKey="Wheat" stroke="rgb(174, 128, 43)" strokeWidth={2} dot={{ r: 4 }} />
+                                        <Line type="monotone" dataKey="Rice" stroke="#4CAF50" strokeWidth={2} dot={{ r: 4 }} />
+                                        <Line type="monotone" dataKey="Sugar" stroke="#1976d2" strokeWidth={2} dot={{ r: 4 }} />
+                                        <Line type="monotone" dataKey="Salt" stroke="#9c27b0" strokeWidth={2} dot={{ r: 4 }} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
                     </>
                 )}
             </main>
