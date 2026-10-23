@@ -10,6 +10,21 @@ import {
   PieChart, Pie, Cell, Legend 
 } from 'recharts';
 
+// Helper function for browser desktop push notifications
+const triggerDesktopNotification = (title, body) => {
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+            new Notification(title, { body, icon: "/favicon.ico" });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                    new Notification(title, { body, icon: "/favicon.ico" });
+                }
+            });
+        }
+    }
+};
+
 function Dashboard() {
     const [userName, setUserName] = useState("");
     const [role, setRole] = useState("");
@@ -24,7 +39,7 @@ function Dashboard() {
     const [pendingDispatches, setPendingDispatches] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    // Alert states
+    // System Alerts State
     const [alerts, setAlerts] = useState([]);
 
     const [stockData, setStockData] = useState([]);
@@ -34,6 +49,13 @@ function Dashboard() {
         { name: '61 - 90 days', value: 0, color: '#ffa000' },
         { name: '> 90 days', value: 0, color: '#f44336' }
     ]);
+
+    // Request notification permissions on initial mount
+    useEffect(() => {
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+    }, []);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -60,7 +82,7 @@ function Dashboard() {
         return () => unsubscribe();
     }, []);
 
-    // Fetch live dashboard data from Firestore & evaluate alert triggers
+    // Fetch live dashboard metrics & evaluate automated alert conditions
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
@@ -131,7 +153,7 @@ function Dashboard() {
                     { name: '> 90 days', value: age90Plus, color: '#f44336' }
                 ]);
 
-                // 2. Fetch Dispatches & Calculate FIFO Compliance
+                // 2. Fetch Dispatches & Calculate True FIFO Compliance
                 const dispatchesSnap = await getDocs(collection(db, "dispatches"));
                 setPendingDispatches(dispatchesSnap.size);
 
@@ -156,40 +178,46 @@ function Dashboard() {
                 setComplianceNum(currentCompliance);
                 setFifoCompliance(`${currentCompliance}%`);
 
-                // --- EVALUATE SYSTEM ALERTS ---
+                // --- SYSTEM ALERT CONDITIONS ---
                 // Alert 1: FIFO Compliance below 90%
                 if (currentCompliance < 90) {
+                    const msg = `FIFO adherence is at ${currentCompliance}% (Target: 90%+). Multiple dispatches bypassed older batches.`;
                     activeAlerts.push({
                         type: "danger",
                         title: "Critical FIFO Compliance Warning",
-                        message: `FIFO adherence has dropped to ${currentCompliance}% (Below target threshold of 90%). Too many dispatches are bypassing older batches.`
+                        message: msg
                     });
+                    triggerDesktopNotification("🚨 FIFO Compliance Alert", msg);
                 }
 
-                // Alert 2: Too Old Stocks (>90 Days)
+                // Alert 2: Aged Stock (>90 Days)
                 if (age90Plus > 0) {
+                    const msg = `There are ${age90Plus} active batch(es) stored for over 90 days without dispatch.`;
                     activeAlerts.push({
                         type: "warning",
                         title: "Aged Stock Risk Alert",
-                        message: `There are ${age90Plus} active batch(es) in the warehouse stored for over 90 days. Immediate dispatch or inspection recommended.`
+                        message: msg
                     });
                 }
 
-                // Alert 3: Expired Stocks Hazard
+                // Alert 3: Expired Stock Hazard
                 if (expiredCount > 0) {
+                    const msg = `Detected ${expiredCount} batch(es) that have passed their expiry date. Locked out from dispatch.`;
                     activeAlerts.push({
                         type: "danger",
                         title: "Expired Stock Hazard",
-                        message: `Detected ${expiredCount} batch(es) that have passed their expiry date. These are locked out of dispatch and require disposal/audit review.`
+                        message: msg
                     });
+                    triggerDesktopNotification("⚠️ Expired Stock Warning", msg);
                 }
 
-                // Alert 4: Low Stock Warning (if total stock is very low)
+                // Alert 4: Low Total Reserve Warning
                 if (totalQty > 0 && totalQty < 500) {
+                    const msg = `Total stock volume has dropped to ${totalQty} kg. Reorder requisition recommended.`;
                     activeAlerts.push({
                         type: "warning",
                         title: "Low Inventory Reserve",
-                        message: `Total warehouse stock has dipped to ${totalQty} kg. Consider raising inward requisitions soon.`
+                        message: msg
                     });
                 }
 
@@ -245,7 +273,7 @@ function Dashboard() {
                 <div style={{ maxWidth: "1240px", margin: "0 auto 25px auto", padding: "0 20px" }}>
                     <div style={{ background: "#0e0b0b", border: "1px solid #333", borderRadius: "10px", padding: "20px" }}>
                         <h3 style={{ margin: "0 0 15px 0", color: "#fff", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                            Critical Alert ({alerts.length})
+                            🚨 System Alert Center ({alerts.length})
                         </h3>
                         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                             {alerts.map((alert, idx) => (
