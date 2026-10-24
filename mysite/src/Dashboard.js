@@ -6,10 +6,9 @@ import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, Legend 
+    BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
+    PieChart, Pie, Cell, Legend 
 } from 'recharts';
-
 
 // Helper function for browser desktop push notifications
 const triggerDesktopNotification = (title, body) => {
@@ -25,6 +24,110 @@ const triggerDesktopNotification = (title, body) => {
         }
     }
 };
+
+// --- HACKATHON INNOVATION: IoT Sensor Telemetry Widget ---
+function IoTSensorWidget({ onTriggerSpike }) {
+    const [temp, setTemp] = useState(24.5);
+    const [humidity, setHumidity] = useState(58);
+    const [isSpikeActive, setIsSpikeActive] = useState(false);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!isSpikeActive) {
+                setTemp((prev) => +(prev + (Math.random() * 0.4 - 0.2)).toFixed(1));
+                setHumidity((prev) => Math.min(75, Math.max(45, Math.round(prev + (Math.random() * 2 - 1)))));
+            }
+        }, 4000);
+        return () => clearInterval(interval);
+    }, [isSpikeActive]);
+
+    const handleSimulateSpike = () => {
+        setIsSpikeActive(true);
+        setTemp(32.8);
+        setHumidity(84.2);
+        onTriggerSpike();
+    };
+
+    const handleResetSpike = () => {
+        setIsSpikeActive(false);
+        setTemp(24.5);
+        setHumidity(58);
+    };
+
+    return (
+        <div style={{
+            maxWidth: "1240px", 
+            margin: "20px auto 10px auto", 
+            padding: "0 20px"
+        }}>
+            <div style={{
+                background: isSpikeActive ? "rgba(244, 67, 54, 0.15)" : "#111827", 
+                border: `1px solid ${isSpikeActive ? "#f44336" : "#374151"}`, 
+                padding: '12px 20px', 
+                borderRadius: '8px', 
+                display: 'flex', 
+                flexWrap: 'wrap',
+                gap: '20px', 
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                color: '#9ca3af',
+                fontSize: '13px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.2)'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontWeight: '600' }}>
+                        <span style={{ 
+                            width: '9px', 
+                            height: '9px', 
+                            backgroundColor: isSpikeActive ? '#f44336' : '#10b981', 
+                            borderRadius: '50%', 
+                            display: 'inline-block', 
+                            boxShadow: isSpikeActive ? '0 0 8px #f44336' : '0 0 8px #10b981' 
+                        }}></span>
+                        IoT Mesh Network: {isSpikeActive ? "⚠️ HAZARD DETECTED" : "Active (ESP32 Nodes)"}
+                    </span>
+                    <span>🌡️ Zone A Temp: <strong style={{ color: isSpikeActive ? '#ff5252' : '#fff' }}>{temp}°C</strong></span>
+                    <span>💧 Zone B Humidity: <strong style={{ color: isSpikeActive ? '#ff5252' : '#fff' }}>{humidity}%</strong></span>
+                </div>
+
+                <div>
+                    {!isSpikeActive ? (
+                        <button 
+                            onClick={handleSimulateSpike}
+                            style={{
+                                background: 'transparent',
+                                border: '1px solid #f44336',
+                                color: '#ff5252',
+                                padding: '4px 10px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontWeight: '600'
+                            }}
+                        >
+                            Demo: Simulate Humidity Spike
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={handleResetSpike}
+                            style={{
+                                background: '#374151',
+                                border: 'none',
+                                color: '#fff',
+                                padding: '4px 10px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '11px'
+                            }}
+                        >
+                            Reset Sensors
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
 
 function Dashboard() {
     const [userName, setUserName] = useState("");
@@ -111,16 +214,13 @@ function Dashboard() {
                         batchCount++;
                         totalQty += remQty;
 
-                        // Aggregate quantity by commodity
                         const comm = data.commodity || "Other";
                         commodityTotals[comm] = (commodityTotals[comm] || 0) + remQty;
 
-                        // Expiry Check
                         if (data.expiryDate && data.expiryDate < todayStr) {
                             expiredCount++;
                         }
 
-                        // Calculate batch age in days based on receiptDate
                         if (data.receiptDate) {
                             const recDate = new Date(data.receiptDate);
                             const diffTime = Math.abs(today - recDate);
@@ -139,14 +239,12 @@ function Dashboard() {
                 setTotalBatches(batchCount);
                 setTotalStockKg(Math.round(totalQty));
 
-                // Format commodity totals for BarChart
                 const formattedStockData = Object.keys(commodityTotals).map((key) => ({
                     commodity: key,
                     quantity: commodityTotals[key]
                 }));
                 setStockData(formattedStockData);
 
-                // Format batch age data for PieChart
                 setBatchAgeData([
                     { name: '0 - 30 days', value: age0_30, color: '#4CAF50' },
                     { name: '31 - 60 days', value: age31_60, color: '#1976d2' },
@@ -180,7 +278,6 @@ function Dashboard() {
                 setFifoCompliance(`${currentCompliance}%`);
 
                 // --- SYSTEM ALERT CONDITIONS ---
-                // Alert 1: FIFO Compliance below 90%
                 if (currentCompliance < 90) {
                     const msg = `FIFO adherence is at ${currentCompliance}% (Target: 90%+). Multiple dispatches bypassed older batches.`;
                     activeAlerts.push({
@@ -188,10 +285,8 @@ function Dashboard() {
                         title: "Critical FIFO Compliance Warning",
                         message: msg
                     });
-                    triggerDesktopNotification("FIFO Compliance Alert", msg);
                 }
 
-                // Alert 2: Aged Stock (>90 Days)
                 if (age90Plus > 0) {
                     const msg = `There are ${age90Plus} active batch(es) stored for over 90 days without dispatch.`;
                     activeAlerts.push({
@@ -202,16 +297,14 @@ function Dashboard() {
                 }
 
                 if(age31_60 > 0){
-                  const msg = `There are ${age31_60} active batch(es) stored for more than 30 days without dispatch`;
-
-                  activeAlerts.push({
-                    type:"warning",
-                    title:"Age Stock Alert",
-                    message:msg
-                  })
+                    const msg = `There are ${age31_60} active batch(es) stored for more than 30 days without dispatch`;
+                    activeAlerts.push({
+                        type:"warning",
+                        title:"Age Stock Alert",
+                        message:msg
+                    })
                 }
 
-                // Alert 3: Expired Stock Hazard
                 if (expiredCount > 0) {
                     const msg = `Detected ${expiredCount} batch(es) that have passed their expiry date. Locked out from dispatch.`;
                     activeAlerts.push({
@@ -219,7 +312,6 @@ function Dashboard() {
                         title: "Expired Stock Hazard",
                         message: msg
                     });
-                    triggerDesktopNotification("⚠️ Expired Stock Warning", msg);
                 }
 
                 if (totalQty > 0 && totalQty < 500) {
@@ -243,9 +335,24 @@ function Dashboard() {
         fetchDashboardData();
     }, []);
 
+    // Handler to inject mock IoT spike warning when button is clicked
+    const handleTriggerSpike = () => {
+        setAlerts((prev) => [
+            {
+                type: "danger",
+                title: "⚠️ IoT Telemetry Spoilage Risk Alert",
+                message: "Zone B humidity exceeded 80% threshold. Automated safety protocol engaged: Recommended FIFO priority shifted to instant dispatch."
+            },
+            ...prev
+        ]);
+    };
+
     return (
         <div style={{ textAlign: "left", minHeight: "100vh", position: "relative", paddingBottom: "60px" }}>
             <Nav />
+
+            {/* IoT Telemetry Widget */}
+            <IoTSensorWidget onTriggerSpike={handleTriggerSpike} />
 
             <div onClick={() => {
                 const form = document.getElementById('class-form');
@@ -331,7 +438,7 @@ function Dashboard() {
                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                     ))}
                                 </Pie>
-                                <Tooltip contentStyle={{ background: '#060505', borderColor: '#444', color: '#fff', borderRadius: '8px' }} />
+                                <Tooltip contentStyle={{ background: '#050505', borderColor: '#444', color: '#fff', borderRadius: '8px' }} />
                                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                             </PieChart>
                         </ResponsiveContainer>
