@@ -350,7 +350,7 @@ function Dashboard() {
                                 <BarChart data={stockData}>
                                     <XAxis dataKey="commodity" stroke="#8294aa" fontSize={12} />
                                     <YAxis stroke="#8294aa" fontSize={12} />
-                                    <Tooltip contentStyle={{ background: '#060505', borderColor: '#444', color: '#fff', borderRadius: '8px' }} />
+                                    <Tooltip contentStyle={{ background: '#fdeded', borderColor: '#444', color: '#fff', borderRadius: '8px' }} />
                                     <Bar dataKey="quantity" fill="rgb(174, 128, 43)" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             )}
