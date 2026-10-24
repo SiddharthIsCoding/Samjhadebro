@@ -187,10 +187,13 @@ function AIForecast() {
                                             }} 
                                         />
                                         <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }} />
-                                        <Line type="monotone" dataKey="Wheat" stroke="rgb(174, 128, 43)" strokeWidth={2} dot={{ r: 4 }} />
+                                        <Line type="monotone" dataKey="Wheat" stroke="rgb(181, 144, 74)" strokeWidth={2} dot={{ r: 4 }} />
                                         <Line type="monotone" dataKey="Rice" stroke="#4CAF50" strokeWidth={2} dot={{ r: 4 }} />
                                         <Line type="monotone" dataKey="Sugar" stroke="#1976d2" strokeWidth={2} dot={{ r: 4 }} />
                                         <Line type="monotone" dataKey="Salt" stroke="#9c27b0" strokeWidth={2} dot={{ r: 4 }} />
+                                        <Line type="monotone" dataKey="Oil" stroke="#d9ff00" strokeWidth={2} dot={{ r: 4 }} />
+                                        <Line type="monotone" dataKey="Chana" stroke="#ff0000" strokeWidth={2} dot={{ r: 4 }} />
+                                        <Line type="monotone" dataKey="Tuvar Dal" stroke="#ff8800" strokeWidth={2} dot={{ r: 4 }} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </div>
